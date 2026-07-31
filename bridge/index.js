@@ -1,10 +1,12 @@
-// OAuth discovery
-app.get("/.well-known/oauth-authorization-server", (req, res) => {
-  res.json({ issuer: "https://svakom-ble-ai-production-03c6.up.railway.app" });
-});import express from "express";
+import express from "express";
 
 const app = express();
 app.use(express.json());
+
+// OAuth discovery
+app.get("/.well-known/oauth-authorization-server", (req, res) => {
+  res.json({ issuer: "https://svakom-ble-ai-production-03c6.up.railway.app" });
+});
 
 const SECRET = process.env.BRIDGE_SECRET || "";
 const queue = [];
@@ -15,14 +17,12 @@ function auth(req, res, next) {
   next();
 }
 
-// bridge.py轮询取指令
 app.get("/toy-next", auth, (req, res) => {
   const cmd = queue.shift();
   res.json(cmd || {});
 });
 
-// MCP Server端点
-app.get("/mcp", auth, (req, res) => {
+app.get("/mcp", (req, res) => {
   res.json({
     name: "svakom-toy",
     version: "1.0",
@@ -35,7 +35,7 @@ app.get("/mcp", auth, (req, res) => {
   });
 });
 
-app.post("/mcp", auth, (req, res) => {
+app.post("/mcp", (req, res) => {
   const { method, params } = req.body;
   if (method === "tools/call") {
     const { name, arguments: args } = params;
