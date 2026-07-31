@@ -45,4 +45,4 @@ app.post("/mcp", auth, (req, res) => {
   res.json({});
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("🚀 Bridge ready"));
+app.listen(process.env.PORT || 3000, "0.0.0.0", () => console.log("🚀 Bridge ready"));
