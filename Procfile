@@ -1,2 +1,1 @@
-web: python bridge.py
- 
+web: node bridge/index.js
