@@ -1,4 +1,7 @@
-import express from "express";
+// OAuth discovery
+app.get("/.well-known/oauth-authorization-server", (req, res) => {
+  res.json({ issuer: "https://svakom-ble-ai-production-03c6.up.railway.app" });
+});import express from "express";
 
 const app = express();
 app.use(express.json());
