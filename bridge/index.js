@@ -71,7 +71,7 @@ app.get("/mcp", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const sessionId = randomUUID();
   sseClients.set(sessionId, res);
-  res.write(`event: endpoint\ndata: ${JSON.stringify({ uri: `/mcp/message?sessionId=${sessionId}` })}\n\n`);
+ res.write(`event: endpoint\ndata: /mcp/message?sessionId=${sessionId}\n\n`);
   req.on("close", () => sseClients.delete(sessionId));
 });
 
