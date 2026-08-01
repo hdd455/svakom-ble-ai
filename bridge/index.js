@@ -63,7 +63,32 @@ app.post("/oauth/token", (req, res) => {
     expires_in: 86400
   });
 });
-
+app.post("/mcp", (req, res) => {
+  const { jsonrpc, id, method, params } = req.body;
+  function send(result) {
+    res.json({ jsonrpc: "2.0", id, result });
+  }
+  if (method === "initialize") return send({
+    protocolVersion: "2024-11-05",
+    capabilities: { tools: {} },
+    serverInfo: { name: "svakom-toy", version: "1.0" }
+  });
+  if (method === "tools/list") return send({ tools: [
+    { name: "toy_set_speed", description: "设置振动强度0-1", inputSchema: { type: "object", properties: { speed: { type: "number" }, sec: { type: "number" } } } },
+    { name: "toy_set_pattern", description: "设置振动花样1-8", inputSchema: { type: "object", properties: { pattern: { type: "integer" }, level: { type: "number" } } } },
+    { name: "toy_stop", description: "停止", inputSchema: { type: "object", properties: {} } },
+    { name: "toy_status", description: "查询是否在线", inputSchema: { type: "object", properties: {} } }
+  ]});
+  if (method === "tools/call") {
+    const { name, arguments: args } = params;
+    if (name === "toy_status") return send({ content: [{ type: "text", text: "在线" }] });
+    if (name === "toy_stop") queue.push({ stop: true });
+    if (name === "toy_set_speed") queue.push({ speed: args.speed, sec: args.sec });
+    if (name === "toy_set_pattern") queue.push({ pattern: args.pattern, level: args.level });
+    return send({ content: [{ type: "text", text: "指令已发送" }] });
+  }
+  send({});
+});
 app.get("/mcp", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
